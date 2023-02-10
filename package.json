@@ -1,11 +1,15 @@
 {
   "author": "ALMEFY GmbH",
-  "name": "@almefy/sdk",
+  "name": "@almefy/client",
   "description": "A simple Node wrapper for the Almefy API.",
-  "keywords": ["authentication", "login", "almefy"],
+  "keywords": [
+    "authentication",
+    "login",
+    "almefy"
+  ],
   "homepage": "https://almefy.com",
   "license": "Apache-2.0",
-  "version": "0.1.5",
+  "version": "0.0.1",
   "main": "src/almefy-api-client.js",
   "dependencies": {
     "axios": "^0.24.0",
