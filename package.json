@@ -1,0 +1,28 @@
+{
+  "author": "ALMEFY GmbH",
+  "name": "@almefy/sdk",
+  "description": "A simple Node wrapper for the Almefy API.",
+  "keywords": ["authentication", "login", "almefy"],
+  "homepage": "https://almefy.com",
+  "license": "Apache-2.0",
+  "version": "0.1.5",
+  "main": "src/almefy-api-client.js",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "crypto-js": "^4.1.1",
+    "debug": "~4.3.3",
+    "dotenv": "^10.0.0",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": ">= 0.0.1"
+  },
+  "engines": {
+    "node": ">= 8.17.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
