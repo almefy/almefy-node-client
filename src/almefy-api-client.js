@@ -86,19 +86,22 @@ class AlmefyAPIClient {
 
   async createApiRequest(method, url, bodyJson = null) {
 
-    const signedToken = this.createApiToken(method, url, bodyJson)
-
     const options = {
       method: method,
       url: url, 
       data: bodyJson,
       headers: {
-        "Authorization": `Bearer ${signedToken}`,
         "Content-Type": "application/json; charset=utf-8",
         "User-Agent": `Almefy Node Client ${this.VERSION} (node version ${process.version})`,
         "X-Client-Version": `${this.VERSION}`,
       }
     }
+
+    if (this.apiSecretBase64) {
+      const signedToken = this.createApiToken(method, url, bodyJson)
+      options.headers["Authorization"] = `Bearer ${signedToken}`;
+    }
+    
     const response = await this._axios.request(options)
     return response
 
@@ -161,7 +164,7 @@ class AlmefyAPIClient {
     bodyJson["identifier"] = `${identifier}` // This cannot be changed by options
     const response = await this.createApiRequest(this.POST_REQUEST, this.ALMEFY_ENROLLMENTS, JSON.stringify(bodyJson))
 
-    return (response.status===200 || response.status===201)? response.data : null;
+    return (response.status===200 || response.status===201)? response.data : null
 
   }
   
@@ -175,14 +178,14 @@ class AlmefyAPIClient {
   async deleteIdentity(identifier) {
 
     const response = await this.createApiRequest(this.DELETE_REQUEST, `${this.ALMEFY_IDENTITIES}/${encodeURIComponent(identifier)}`, null)
-    return (response.status===200 || response.status===201)? response.data : null;
+    return (response.status===200 || response.status===201)? response.data : null
 
   }
 
   async deleteToken(id) {
 
     const response = await this.createApiRequest(this.DELETE_REQUEST, `${this.ALMEFY_TOKENS}/${encodeURIComponent(id)}`, null)
-    return (response.status===200 || response.status===201)? response.data : null;
+    return (response.status===200 || response.status===201)? response.data : null
     
   }
 
@@ -193,18 +196,31 @@ class AlmefyAPIClient {
 
   async authenticate(token) {
 
-    const authenticateUrl = this.ALMEFY_AUTHENTICATE.replace("{identity}", token.sub);
-    const bodyJson = { "challenge": token.jti, "otp": token.otp };
-    await this.createApiRequest(this.POST_REQUEST, authenticateUrl, JSON.stringify(bodyJson));
+    const authenticateUrl = this.ALMEFY_AUTHENTICATE.replace("{identity}", token.sub)
+    const bodyJson = { "challenge": token.jti, "otp": token.otp }
+    var response = await this.createApiRequest(this.POST_REQUEST, authenticateUrl, JSON.stringify(bodyJson));
 
-    return (response.status===200)? true : false;
+    // console.log(response);
+
+    return (response.status===200)? true : false
 
   }
 
-  decodeJwt(jwt) {
-    const token = jwt.verify(jwt, this.secretKeyBase64, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
+  verifyJwt(jwttoken) {
+    
+    const secretKeyBase64 = Buffer.from(this.apiSecretBase64, "base64")
+    const token = jwt.verify(jwttoken, secretKeyBase64, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
     return token;
+
   }
+
+  decodeJwt(jwttoken) {
+
+    const token = jwt.decode(jwttoken, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
+    return token;
+
+  }
+
 
 }
 
