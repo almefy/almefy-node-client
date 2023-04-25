@@ -36,6 +36,8 @@ class AlmefyAPIClient {
     this.ALMEFY_ENROLLMENTS = "/v1/entity/identities/enroll"
     this.ALMEFY_TOKENS = "/v1/entity/tokens"
     this.ALMEFY_AUTHENTICATE = "/v1/entity/identities/{identity}/authenticate"
+    this.ALMEFY_CONFIGURATION = "/v1/entity/configuration"
+    this.ALMEFY_SESSIONS = "/v1/entity/sessions"
     
     this.GET_REQUEST = "GET"
     this.POST_REQUEST = "POST"
@@ -63,7 +65,7 @@ class AlmefyAPIClient {
     this._axios = axios.create(axiosLocalConfig)
     if (apiConfig.debug) {
       this._axios.interceptors.request.use(request => {
-        console.log('Starting Request', JSON.stringify(request, null, 2))
+        // console.log('Starting Request', JSON.stringify(request, null, 2))
         return request
       })
     }
@@ -136,6 +138,27 @@ class AlmefyAPIClient {
 
   }
 
+  async getConfiguration() {
+
+    const response = await this.createApiRequest(this.GET_REQUEST, this.ALMEFY_CONFIGURATION, null)
+    return (response.status===200 && response.data)? response.data : null
+
+  }
+
+  async setConfiguration(configuration) {
+
+    const options = JSON.stringify({
+      "websiteUrl" : configuration.websiteUrl ? configuration.websiteUrl : null,
+      "authenticationUrl" : configuration.authenticationUrl ? configuration.authenticationUrl : null, 
+      "supportSessions" : configuration.supportSessions ? configuration.supportSessions : false
+    });
+
+    const response = await this.createApiRequest(this.PATCH_REQUEST, this.ALMEFY_CONFIGURATION, options)
+
+    return (response.status===200 && response.data)? response.data : null
+
+  }
+
   async getIdentities() {
 
     const response = await this.createApiRequest(this.GET_REQUEST, this.ALMEFY_IDENTITIES, null)
@@ -146,9 +169,20 @@ class AlmefyAPIClient {
   async getIdentity(identifier) {
 
     const response = await this.createApiRequest(this.GET_REQUEST, `${this.ALMEFY_IDENTITIES}/${encodeURIComponent(identifier)}`, null)
-    console.log(identifier)
+    // console.log(identifier)
     return (response.status===200 && response.data)? response.data : null    
 
+  }
+
+
+  // getSession(sessionsId)
+
+  // getSessions(sessionsToUpdate = [])
+
+  // updateSessions(sessions = [])
+
+  async logoutSession(sessionId) {
+    const response = await this.createApiRequest(this.DELETE_REQUEST, `${this.ALMEFY_SESSIONS}/${sessionId}}`, null)
   }
 
   async enrollIdentity(identifier, options = []) {
@@ -200,9 +234,7 @@ class AlmefyAPIClient {
     const bodyJson = { "challenge": token.jti, "otp": token.otp }
     var response = await this.createApiRequest(this.POST_REQUEST, authenticateUrl, JSON.stringify(bodyJson));
 
-    // console.log(response);
-
-    return (response.status===200)? true : false
+    return (response.status===200)? token.sub : null
 
   }
 
