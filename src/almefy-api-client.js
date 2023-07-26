@@ -86,7 +86,7 @@ class AlmefyAPIClient {
   //   }
   // }
 
-  async createApiRequest(method, url, bodyJson = null) {
+  async createApiRequest(method, url, bodyJson = null, createBearerToken = true) {
 
     const options = {
       method: method,
@@ -99,7 +99,7 @@ class AlmefyAPIClient {
       }
     }
 
-    if (this.apiSecretBase64) {
+    if (createBearerToken) {
       const signedToken = this.createApiToken(method, url, bodyJson)
       options.headers["Authorization"] = `Bearer ${signedToken}`;
     }
@@ -193,6 +193,8 @@ class AlmefyAPIClient {
         "sendEmail": false,
         "sendEmailTo": "",
         "sendEmailLocale": "en_US",
+        "role": "ROLE_USER",
+        "timeout": 3600
     }, options)
 
     bodyJson["identifier"] = `${identifier}` // This cannot be changed by options
@@ -232,7 +234,7 @@ class AlmefyAPIClient {
 
     const authenticateUrl = this.ALMEFY_AUTHENTICATE.replace("{identity}", token.sub)
     const bodyJson = { "challenge": token.jti, "otp": token.otp }
-    var response = await this.createApiRequest(this.POST_REQUEST, authenticateUrl, JSON.stringify(bodyJson));
+    var response = await this.createApiRequest(this.POST_REQUEST, authenticateUrl, JSON.stringify(bodyJson), false);
 
     return (response.status===200)? token.sub : null
 
