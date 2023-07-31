@@ -61,11 +61,29 @@ class AlmefyAPIClient {
         httpsAgent: new https.Agent({  
           rejectUnauthorized: false
         }),
+        validateStatus: function (status) {
+          // 200	Ok, resource was updated
+          // 201	Ok, resource was created
+          // 202	Ok, request was accepted
+          // 204	Ok, but no content is returned
+          // 400 -> Submitted data is invalid, Bad Request, es ist generell was falsch, z.B. kein Body bei einem POST
+          // 401	Unauthorized access
+          // 403	Forbidden, insufficient credentials
+          // 404	Resource not Found
+          // 410	Resource is gone
+          // 415 -> falsches Format, also wenn jemand XML schickt, JSON aber verlangt ist
+          // 422 -> Unprocessable Entity, das ist der richtige Wert, wenn Validierung fehl schlägt.
+          // 423	Resource is locked
+          // 429	Too many requests
+          // 500	Something went wrong on Almefy's end
+          const validCodes = [200, 201, 202, 204, 400, 401, 403, 404, 410, 415, 422, 423, 429];
+          return (validCodes.includes(status));
+        }
     }, axiosConfig)
     this._axios = axios.create(axiosLocalConfig)
     if (apiConfig.debug) {
       this._axios.interceptors.request.use(request => {
-        // console.log('Starting Request', JSON.stringify(request, null, 2))
+        console.log('Starting Request', JSON.stringify(request, null, 2))
         return request
       })
     }
@@ -222,12 +240,14 @@ class AlmefyAPIClient {
 
     const response = await this.createApiRequest(this.DELETE_REQUEST, `${this.ALMEFY_TOKENS}/${encodeURIComponent(id)}`, null)
     return (response.status===200 || response.status===201)? response.data : null
-    
+
   }
 
   //deprecated
   async verifyToken(token) {
+
     return this.authenticate(token); 
+
   }
 
   async authenticate(token) {
