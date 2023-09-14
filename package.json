@@ -9,7 +9,7 @@
   ],
   "homepage": "https://almefy.com",
   "license": "Apache-2.0",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "src/almefy-api-client.js",
   "dependencies": {
     "axios": "^0.24.0",
