@@ -212,9 +212,10 @@ class AlmefyAPIClient {
         "nickname": null,
         "sendEmail": false,
         "sendEmailTo": "",
-        "sendEmailLocale": "en_US",
+        "sendEmailLocale": "de-DE",
+        "sendEmailTimeZone": "Europe/Berlin",
         "role": "ROLE_USER",
-        "timeout": 2592000
+        "timeout": 3600
     }, options);
 
     bodyJson["identifier"] = `${identifier}`; // This cannot be changed by options
