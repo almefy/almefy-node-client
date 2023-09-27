@@ -41,6 +41,7 @@ class AlmefyAPIClient {
 
     this.ALMEFY_ENROLLMENTS = "/v1/entity/enrollments";
     this.ALMEFY_ENROLLMENTS_STATUS = "/v1/entity/enrollments/{enrollment}/status";
+    this.ALMEFY_ENROLLMENT_PATCH = "/v1/entity/enrollments/{enrollment}/expire";
     
     this.GET_REQUEST = "GET";
     this.POST_REQUEST = "POST";
@@ -262,21 +263,6 @@ class AlmefyAPIClient {
 
   }
 
-  verifyJwt(jwttoken) {
-    
-    const secretKeyBase64 = Buffer.from(this.apiSecretBase64, "base64");
-    const token = jwt.verify(jwttoken, secretKeyBase64, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
-    return token;
-
-  }
-
-  decodeJwt(jwttoken) {
-
-    const token = jwt.decode(jwttoken, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
-    return token;
-
-  }
-
   async getEnrollments() {
 
     const response = await this.createApiRequest(this.GET_REQUEST, this.ALMEFY_ENROLLMENTS, null);
@@ -293,16 +279,32 @@ class AlmefyAPIClient {
 
   async getEnrollmentStatus(id) {
 
-    const authenticateUrl = this.ALMEFY_ENROLLMENTS_STATUS.replace("{enrollment}", id);
-    const response = await this.createApiRequest(this.GET_REQUEST, authenticateUrl, null);
+    const getEnrollmentStatusUrl = this.ALMEFY_ENROLLMENTS_STATUS.replace("{enrollment}", id);
+    const response = await this.createApiRequest(this.GET_REQUEST, getEnrollmentStatusUrl, null);
     return (response.status===200 && response.data)? response.data : null;
 
   }
   
-  async deleteEnrollment(id) {
+  async revokeEnrollment(id) {
 
-    const response = await this.createApiRequest(this.DELETE_REQUEST, `${this.ALMEFY_ENROLLMENTS}/${id}`, null);
+    const revokeEnrollmentUrl = this.ALMEFY_ENROLLMENT_PATCH.replace("{enrollment}", id);
+    const response = await this.createApiRequest(this.PATCH_REQUEST, revokeEnrollmentUrl, null);
     return (response.status===200 || response.status===201)? response.data : null;
+
+  }
+
+  verifyJwt(jwttoken) {
+    
+    const secretKeyBase64 = Buffer.from(this.apiSecretBase64, "base64");
+    const token = jwt.verify(jwttoken, secretKeyBase64, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
+    return token;
+
+  }
+
+  decodeJwt(jwttoken) {
+
+    const token = jwt.decode(jwttoken, {clockTolerance: this.REQUEST_TIMESTAMP_LEEWAY});
+    return token;
 
   }
 
