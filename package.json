@@ -1,6 +1,6 @@
 {
   "author": "ALMEFY GmbH",
-  "name": "@almefy/cli",
+  "name": "@almefy/client",
   "description": "A simple Node wrapper for the Almefy API.",
   "keywords": [
     "authentication",
