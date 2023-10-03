@@ -184,7 +184,7 @@ class AlmefyAPIClient {
 
   async getIdentities() {
 
-    const response = await this.createApiRequest(this.GET_REQUEST, this.ALMEFY_IDENTITIES, null);
+    const response = await this.createApiRequest(this.GET_REQUEST, this.ALMEFY_IDENTITIES + "?limit=500", null);
     return (response.status===200 && response.data)? response.data : null;
 
   }
@@ -281,15 +281,15 @@ class AlmefyAPIClient {
 
     const getEnrollmentStatusUrl = this.ALMEFY_ENROLLMENTS_STATUS.replace("{enrollment}", id);
     const response = await this.createApiRequest(this.GET_REQUEST, getEnrollmentStatusUrl, null);
-    return (response.status===200 && response.data)? response.data : null;
-
+    return (response.status===204)? true : (response.status===410)? false : null;
   }
   
   async revokeEnrollment(id) {
 
     const revokeEnrollmentUrl = this.ALMEFY_ENROLLMENT_PATCH.replace("{enrollment}", id);
     const response = await this.createApiRequest(this.PATCH_REQUEST, revokeEnrollmentUrl, null);
-    return (response.status===200 || response.status===201)? response.data : null;
+    console.log(revokeEnrollmentUrl, response.status);
+    return (response.status===204)? true : (response.status===410)? true : null;
 
   }
 
