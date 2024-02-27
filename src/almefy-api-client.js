@@ -126,7 +126,7 @@ class AlmefyAPIClient {
       const signedToken = this.createApiToken(method, url, bodyJson);
       options.headers["Authorization"] = `Bearer ${signedToken}`;
     }
-    
+
     const response = await this._axios.request(options);
     return response;
 
